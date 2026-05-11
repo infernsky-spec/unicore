@@ -1,0 +1,1 @@
+export { TeacherLayout } from './AdminLayout';

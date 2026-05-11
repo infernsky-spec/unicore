@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniCore — Deployment & Preview Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0c0c0e;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --accent-amber: #ffb800;
+            --accent-gold: #f59e0b;
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --border: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at 50% -20%, rgba(245, 158, 11, 0.08) 0%, transparent 50%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 4rem 2rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 5rem;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 5rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #ffffff, var(--accent-amber));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -2px;
+            margin-bottom: 1rem;
+        }
+
+        .tagline {
+            color: var(--text-secondary);
+            font-size: 1.25rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            font-weight: 400;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 2.5rem;
+            backdrop-filter: blur(12px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .card:hover {
+            border-color: rgba(245, 158, 11, 0.3);
+            transform: translateY(-8px);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.75rem;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        p {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            flex-grow: 1;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-amber), var(--accent-gold));
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(245, 158, 11, 0.2);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: #fff;
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: #fff;
+        }
+
+        .footer-branding {
+            margin-top: auto;
+            text-align: center;
+            padding-top: 4rem;
+            border-top: 1px solid var(--border);
+            width: 100%;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .footer-branding span {
+            color: var(--accent-amber);
+            font-weight: 600;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--accent-amber);
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        code {
+            background: rgba(0,0,0,0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: var(--accent-amber);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="badge">Version 4.5 Stable</div>
+            <h1>UniCore</h1>
+            <p class="tagline">Academic Governance Network</p>
+        </header>
+
+        <div class="grid">
+            <!-- Local Launch -->
+            <div class="card">
+                <span class="card-icon">🚀</span>
+                <h2>Local Instance</h2>
+                <p>Launch the full system (Backend + Frontend) on your local machine for testing and development.</p>
+                <div style="background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem; font-size: 0.85rem;">
+                    <span style="color: #6ee7b7;">></span> Run <code>Launch_UniCore.bat</code>
+                </div>
+                <a href="#" class="btn btn-primary">Launch Instructions</a>
+            </div>
+
+            <!-- Public Preview -->
+            <div class="card">
+                <span class="card-icon">🌐</span>
+                <h2>Public Preview</h2>
+                <p>Deploy UniCore to a public URL so other users can preview the interface and features remotely.</p>
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <a href="https://vercel.com/new/import?s=https://github.com/USER/edubridge" class="btn btn-outline" target="_blank">Deploy Frontend to Vercel</a>
+                    <a href="https://render.com" class="btn btn-outline" target="_blank">Deploy Backend to Render</a>
+                </div>
+            </div>
+
+            <!-- Documentation -->
+            <div class="card">
+                <span class="card-icon">📚</span>
+                <h2>Documentation</h2>
+                <p>Review the comprehensive system architecture, API endpoints, and branding guidelines.</p>
+                <a href="UniCore_Documentation.html" class="btn btn-outline">View Docs</a>
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 4rem; text-align: center;">
+            <span class="card-icon">⚡</span>
+            <h2>Instant Share Link</h2>
+            <p>Need a quick link for a client <strong>right now</strong>? Use Localtunnel to expose your local instance publicly.</p>
+            <div style="background: rgba(0,0,0,0.2); padding: 1.5rem; border-radius: 12px; font-family: monospace; font-size: 1rem; margin-bottom: 1rem; border: 1px dashed var(--border);">
+                npx localtunnel --port 5173
+            </div>
+            <p style="font-size: 0.85rem;">Note: Backend must also be tunneled or hosted for data to load.</p>
+        </div>
+
+        <footer class="footer-branding">
+            &copy; 2026 UniCore Protocol. Powered by <span>NexaVision Technologies</span>.
+        </footer>
+    </div>
+</body>
+</html>

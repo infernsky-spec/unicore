@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/edubridge-logo.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="EduBridge — Ghana University Management System" />
+    <title>EduBridge — University Management System</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font-family: Inter, sans-serif; background: #0c0c0e; }
+      #root { min-height: 100vh; }
+      .loading { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #0c0c0e; flex-direction: column; gap: 16px; }
+      .spinner { width: 36px; height: 36px; border: 3px solid rgba(217, 119, 6, 0.2); border-top: 3px solid #d97706; border-radius: 50%; animation: spin 0.8s ease-in-out infinite; }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      .loading-brand { color: #d97706; font-size: 20px; font-weight: 900; letter-spacing: -0.05em; text-transform: uppercase; }
+      .loading-text { color: #334155; font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.3em; margin-top: 4px; }
+      .loading-nexavision { color: #1e293b; font-size: 6px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.4em; margin-top: 24px; }
+    </style>
+  </head>
+  <body class="antialiased">
+    <div id="root"><div class="loading"><div style="text-align:center"><div class="spinner" style="margin:0 auto"></div><p class="loading-brand">UniCore</p><p class="loading-text">Initializing Governance Network...</p><p class="loading-nexavision">Powered by NexaVision</p></div></div></div>
+    <script type="module" src="/src/main.jsx"></script>
+    <script>
+      // Fallback if React doesn't load
+      window.addEventListener('error', function(e) {
+        console.error('Critical error:', e);
+        document.getElementById('root').innerHTML = '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#f1f5f9;font-family:Inter,sans-serif"><div style="text-align:center;background:white;padding:30px;border-radius:8px;max-width:500px"><h1 style="color:#dc2626;margin-bottom:12px;font-size:18px;font-weight:600">Something Went Wrong</h1><p style="color:#64748b;margin-bottom:16px;font-size:14px">' + (e.message || 'An error occurred while loading the application') + '</p><button onclick="window.location.reload()" style="background:#2563eb;color:white;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-size:14px;font-weight:500">Refresh Page</button></div></div>';
+      });
+    </script>
+  </body>
+</html>

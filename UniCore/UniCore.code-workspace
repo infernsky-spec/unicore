@@ -1,0 +1,84 @@
+{
+  "folders": [
+    { "name": "UniCore Root", "path": "." },
+    { "name": "Backend", "path": "backend" },
+    { "name": "Frontend", "path": "frontend" }
+  ],
+  "settings": {
+    "editor.formatOnSave": true,
+    "editor.tabSize": 2,
+    "editor.wordWrap": "on",
+    "emmet.includeLanguages": { "javascript": "javascriptreact" },
+    "tailwindCSS.includeLanguages": { "javascript": "javascript", "html": "HTML" },
+    "files.associations": { "*.jsx": "javascriptreact" },
+    "terminal.integrated.defaultProfile.windows": "Command Prompt",
+    "terminal.integrated.defaultProfile.linux": "bash",
+    "terminal.integrated.defaultProfile.osx": "zsh"
+  },
+  "extensions": {
+    "recommendations": [
+      "dbaeumer.vscode-eslint",
+      "esbenp.prettier-vscode",
+      "bradlc.vscode-tailwindcss",
+      "formulahendry.auto-rename-tag",
+      "dsznajder.es7-react-js-snippets",
+      "mongodb.mongodb-vscode",
+      "rangav.vscode-thunder-client"
+    ]
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Backend: Node.js",
+        "type": "node",
+        "request": "launch",
+        "cwd": "${workspaceFolder}/backend",
+        "program": "${workspaceFolder}/backend/server.js",
+        "env": { "NODE_ENV": "development" },
+        "console": "integratedTerminal",
+        "restart": true,
+        "runtimeExecutable": "nodemon",
+        "runtimeArgs": ["--experimental-specifier-resolution=node"]
+      }
+    ]
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Start Backend",
+        "type": "shell",
+        "command": "cd backend && npm run dev",
+        "group": "build",
+        "presentation": { "reveal": "always", "panel": "new" }
+      },
+      {
+        "label": "Start Frontend",
+        "type": "shell",
+        "command": "cd frontend && npm run dev",
+        "group": "build",
+        "presentation": { "reveal": "always", "panel": "new" }
+      },
+      {
+        "label": "Install All Dependencies",
+        "type": "shell",
+        "command": "cd backend && npm install && cd ../frontend && npm install",
+        "group": "build",
+        "presentation": { "reveal": "always", "panel": "shared" }
+      },
+      {
+        "label": "Seed Database",
+        "type": "shell",
+        "command": "cd backend && npm run seed",
+        "group": "build",
+        "presentation": { "reveal": "always", "panel": "shared" }
+      },
+      {
+        "label": "🚀 Start UniCore (Both Servers)",
+        "dependsOn": ["Start Backend", "Start Frontend"],
+        "group": { "kind": "build", "isDefault": true }
+      }
+    ]
+  }
+}

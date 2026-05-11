@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>EduBridge — Product Overview</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;color:#1e293b;background:#f8fafc;line-height:1.6}
+.cover{background:linear-gradient(135deg,#0f1f3d,#1d4ed8,#0891b2);color:white;min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:60px 20px;page-break-after:always}
+.cover h1{font-size:64px;font-weight:900;letter-spacing:-2px;margin-bottom:8px}
+.cover .sub{font-size:24px;opacity:0.8;margin-bottom:40px}
+.cover .tagline{font-size:16px;opacity:0.6;max-width:600px}
+.badge-row{display:flex;gap:12px;justify-content:center;margin:30px 0;flex-wrap:wrap}
+.badge{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);padding:8px 18px;border-radius:50px;font-size:14px;font-weight:600}
+.container{max-width:1000px;margin:0 auto;padding:60px 40px}
+.section{margin-bottom:60px;page-break-inside:avoid}
+h2{font-size:32px;font-weight:800;color:#0f1f3d;margin-bottom:8px;padding-bottom:12px;border-bottom:3px solid #1d4ed8}
+h3{font-size:20px;font-weight:700;color:#1d4ed8;margin:24px 0 10px}
+h4{font-size:16px;font-weight:600;color:#374151;margin:16px 0 6px}
+p{margin-bottom:12px;color:#374151;font-size:15px}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;margin:20px 0}
+.card{background:white;border:1px solid #e2e8f0;border-radius:16px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
+.card .icon{font-size:32px;margin-bottom:12px}
+.card h4{font-size:16px;font-weight:700;color:#0f1f3d;margin:0 0 6px}
+.card p{font-size:13px;color:#64748b;margin:0}
+.feature-list{list-style:none;space:8px}
+.feature-list li{padding:8px 0 8px 28px;position:relative;border-bottom:1px solid #f1f5f9;font-size:14px;color:#374151}
+.feature-list li:before{content:"✓";position:absolute;left:4px;color:#059669;font-weight:800}
+.role-card{background:white;border:1px solid #e2e8f0;border-radius:16px;padding:24px;margin-bottom:16px}
+.role-header{display:flex;align-items:center;gap:16px;margin-bottom:16px}
+.role-icon{width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.role-icon.admin{background:#ede9fe}
+.role-icon.teacher{background:#dbeafe}
+.role-icon.student{background:#dcfce7}
+.role-icon.parent{background:#fef3c7}
+.highlight-box{background:linear-gradient(135deg,#eff6ff,#dbeafe);border:1px solid #bfdbfe;border-radius:16px;padding:24px;margin:20px 0}
+.highlight-box h3{color:#1d4ed8;margin-top:0}
+.step-list{counter-reset:step}
+.step{display:flex;gap:16px;margin-bottom:20px;align-items:flex-start}
+.step-num{width:36px;height:36px;background:#1d4ed8;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0;font-size:15px}
+.tech-badge{display:inline-block;background:#f1f5f9;border:1px solid #cbd5e1;border-radius:8px;padding:4px 12px;font-size:13px;font-weight:600;color:#475569;margin:4px 3px}
+.screen-mock{background:white;border:2px solid #e2e8f0;border-radius:16px;overflow:hidden;margin:20px 0;box-shadow:0 4px 24px rgba(0,0,0,0.08)}
+.screen-bar{background:#1d4ed8;color:white;padding:12px 20px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+.screen-content{padding:20px;background:#f8fafc;min-height:100px}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:20px 0}
+.stat-box{background:white;border:1px solid #e2e8f0;border-radius:12px;padding:20px;text-align:center}
+.stat-box .num{font-size:36px;font-weight:900;color:#1d4ed8}
+.stat-box .lbl{font-size:13px;color:#64748b;margin-top:4px}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px}
+th{background:#1d4ed8;color:white;padding:10px 14px;text-align:left;font-weight:600}
+td{padding:10px 14px;border-bottom:1px solid #f1f5f9;color:#374151}
+tr:nth-child(even) td{background:#f8fafc}
+.copyright-box{background:#0f1f3d;color:white;border-radius:16px;padding:32px;margin-top:40px}
+.copyright-box h3{color:#60a5fa;margin-bottom:16px}
+.copyright-box ol{padding-left:20px;space-y:8px}
+.copyright-box li{margin-bottom:10px;font-size:14px;color:#cbd5e1}
+@media print{.cover{min-height:auto}.container{padding:40px 20px}}
+</style>
+</head>
+<body>
+
+<!-- COVER PAGE -->
+<div class="cover">
+  <div style="font-size:72px;margin-bottom:16px">🎓</div>
+  <h1>EduBridge</h1>
+  <div class="sub">University Management System</div>
+  <p class="tagline">The complete academic management platform for Ghanaian and African universities — built for the digital age.</p>
+  <div class="badge-row">
+    <span class="badge">⚡ Full-Stack Web App</span>
+    <span class="badge">🤖 AI-Powered</span>
+    <span class="badge">📱 Mobile Ready</span>
+    <span class="badge">🏫 Multi-University</span>
+    <span class="badge">🇬🇭 Built for Ghana</span>
+  </div>
+  <p style="opacity:0.4;font-size:13px;margin-top:40px">Developed by NexaVision Technologies · © 2024 All Rights Reserved</p>
+</div>
+
+<div class="container">
+
+  <!-- EXECUTIVE SUMMARY -->
+  <div class="section">
+    <h2>Executive Summary</h2>
+    <p>EduBridge is a comprehensive, cloud-ready university management system designed specifically for Ghanaian and African higher education institutions. It replaces fragmented paper-based systems and disconnected spreadsheets with a single, unified digital platform that every stakeholder — administrators, lecturers, students, and parents — can access from any device.</p>
+    <p>Unlike generic international platforms, EduBridge understands the Ghanaian university context: it supports all major universities from UG to KNUST to Central University, integrates with local fee payment methods like Mobile Money, and provides AI-powered academic assistance in a way that is relevant to students on the continent.</p>
+    <div class="stat-row">
+      <div class="stat-box"><div class="num">35+</div><div class="lbl">Universities Supported</div></div>
+      <div class="stat-box"><div class="num">4</div><div class="lbl">User Roles</div></div>
+      <div class="stat-box"><div class="num">100%</div><div class="lbl">Mobile Compatible</div></div>
+      <div class="stat-box"><div class="num">∞</div><div class="lbl">Students Scalable</div></div>
+    </div>
+  </div>
+
+  <!-- KEY FEATURES -->
+  <div class="section">
+    <h2>Core Features</h2>
+    <div class="card-grid">
+      <div class="card"><div class="icon">🏛️</div><h4>Multi-University Support</h4><p>Select from 35+ Ghanaian universities with branding. Each institution gets its own branded portal.</p></div>
+      <div class="card"><div class="icon">👥</div><h4>Role-Based Access</h4><p>Admin, Lecturer, Student, and Parent each see exactly what they need — nothing more, nothing less.</p></div>
+      <div class="card"><div class="icon">📋</div><h4>Live Attendance</h4><p>Lecturers create sessions with a 6-digit PIN. Students mark attendance in real time via the portal app.</p></div>
+      <div class="card"><div class="icon">💰</div><h4>Fees Management</h4><p>Full fee billing, payment recording, balance tracking, and receipt history. Supports GHS and mobile money.</p></div>
+      <div class="card"><div class="icon">📚</div><h4>Course Registration</h4><p>Students register online for courses. Lecturers register the courses they teach. Admin controls everything.</p></div>
+      <div class="card"><div class="icon">🤖</div><h4>AI Academic Assistant</h4><p>Powered by Claude AI and ChatGPT. Helps students with study plans, explanations, and academic guidance.</p></div>
+      <div class="card"><div class="icon">📊</div><h4>Results & GPA</h4><p>Lecturers upload scores. System auto-calculates grades and GPA. Students view published results instantly.</p></div>
+      <div class="card"><div class="icon">📅</div><h4>Exam Timetable</h4><p>Admin schedules exams with venues, invigilators, and times. Students view their personalised timetable.</p></div>
+      <div class="card"><div class="icon">📁</div><h4>Resource Portal</h4><p>Lecturers upload notes, slides, past papers, and assignments. Students access everything in one place.</p></div>
+      <div class="card"><div class="icon">👨‍👩‍👦</div><h4>Parent Portal</h4><p>Parents monitor fees, attendance, and academic progress of their children in real time.</p></div>
+      <div class="card"><div class="icon">📤</div><h4>Database Import</h4><p>Schools transfer existing student records via CSV/JSON. Full migration support from legacy systems.</p></div>
+      <div class="card"><div class="icon">🔔</div><h4>Announcements</h4><p>Admin and lecturers post announcements to all users or specific groups with priority levels.</p></div>
+    </div>
+  </div>
+
+  <!-- USER ROLES -->
+  <div class="section">
+    <h2>User Roles & Capabilities</h2>
+
+    <div class="role-card">
+      <div class="role-header">
+        <div class="role-icon admin">⚙️</div>
+        <div><h3 style="margin:0">System Administrator</h3><p style="margin:0;color:#64748b;font-size:14px">Controls everything — the super user of the platform</p></div>
+      </div>
+      <ul class="feature-list">
+        <li>Create and manage all user accounts (students, teachers, parents)</li>
+        <li>Set up faculties, departments, and programmes</li>
+        <li>Create and configure semesters, goals, events, and academic calendars</li>
+        <li>Manage course catalogue and assign teachers to courses</li>
+        <li>Generate fee structures and record payments</li>
+        <li>Schedule exams and assign invigilators</li>
+        <li>Import student databases from existing school systems</li>
+        <li>Link parent accounts to student accounts</li>
+        <li>Post and manage university-wide announcements</li>
+        <li>View university-wide statistics and analytics dashboards</li>
+      </ul>
+    </div>
+
+    <div class="role-card">
+      <div class="role-header">
+        <div class="role-icon teacher">👨‍🏫</div>
+        <div><h3 style="margin:0">Lecturer / Teaching Staff</h3><p style="margin:0;color:#64748b;font-size:14px">Manages course delivery and student assessment</p></div>
+      </div>
+      <ul class="feature-list">
+        <li>Register for courses they teach (self-service or admin-assigned)</li>
+        <li>Create live attendance sessions with PIN codes</li>
+        <li>View real-time attendance as students mark in</li>
+        <li>Close sessions — system auto-marks absent students</li>
+        <li>Upload and manage course resources (notes, slides, past papers)</li>
+        <li>Enter student scores — system auto-calculates grades and GPA</li>
+        <li>View exam schedules for their courses</li>
+        <li>Post course-level announcements</li>
+      </ul>
+    </div>
+
+    <div class="role-card">
+      <div class="role-header">
+        <div class="role-icon student">🎓</div>
+        <div><h3 style="margin:0">Student</h3><p style="margin:0;color:#64748b;font-size:14px">The primary user — complete academic self-service</p></div>
+      </div>
+      <ul class="feature-list">
+        <li>Self-register using email or Google/Apple sign-in</li>
+        <li>Link their university index number to their account</li>
+        <li>Register for courses each semester</li>
+        <li>Mark attendance using the live session PIN from lecturer</li>
+        <li>View attendance records and warnings per course</li>
+        <li>Check personalised exam timetable with invigilator details and venue</li>
+        <li>View published results and cumulative GPA</li>
+        <li>Track fees: total billed, amount paid, balance, payment history</li>
+        <li>Download course notes, past papers, and resources</li>
+        <li>Access AI Academic Assistant for study plans and tutoring</li>
+      </ul>
+    </div>
+
+    <div class="role-card">
+      <div class="role-header">
+        <div class="role-icon parent">👨‍👩‍👦</div>
+        <div><h3 style="margin:0">Parent / Guardian</h3><p style="margin:0;color:#64748b;font-size:14px">Monitor and stay informed about your child's progress</p></div>
+      </div>
+      <ul class="feature-list">
+        <li>View linked children's academic profiles</li>
+        <li>Monitor attendance records and warnings</li>
+        <li>Track fee bills, payment history, and outstanding balances</li>
+        <li>Receive notifications about important events</li>
+        <li>View academic calendar and exam schedules</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ATTENDANCE SYSTEM -->
+  <div class="section">
+    <h2>How the Attendance System Works</h2>
+    <div class="highlight-box">
+      <h3>Real-Time PIN-Based Attendance</h3>
+      <p>EduBridge uses a secure, real-time PIN system that ensures only physically present students mark attendance — eliminating proxy attendance fraud.</p>
+    </div>
+    <div class="step"><div class="step-num">1</div><div><h4>Lecturer Opens Session</h4><p>The lecturer logs into EduBridge (web or mobile portal), selects their course, and creates an attendance session. A unique 6-digit PIN is generated instantly.</p></div></div>
+    <div class="step"><div class="step-num">2</div><div><h4>PIN Shared with Students</h4><p>The lecturer displays the PIN on screen or reads it out. Students who are physically present can see it. The PIN is only valid for the duration set by the admin (default: 30 minutes).</p></div></div>
+    <div class="step"><div class="step-num">3</div><div><h4>Students Mark Attendance</h4><p>Students log into the EduBridge portal on their phone, select their course, and enter the PIN. Students who mark within the first 15 minutes are "Present". After that, they are "Late".</p></div></div>
+    <div class="step"><div class="step-num">4</div><div><h4>Real-Time Dashboard</h4><p>The lecturer sees a live feed of who has marked attendance. The count updates in real time via WebSocket technology.</p></div></div>
+    <div class="step"><div class="step-num">5</div><div><h4>Session Closed</h4><p>When the lecturer closes the session, all students who have not marked are automatically recorded as "Absent". Attendance summaries update immediately.</p></div></div>
+    <div class="step"><div class="step-num">6</div><div><h4>Warnings Issued</h4><p>The system automatically flags students below 60% attendance as "At Risk" and below 50% as "Critical". Both the student and their parent are notified.</p></div></div>
+  </div>
+
+  <!-- AI ASSISTANT -->
+  <div class="section">
+    <h2>AI Academic Assistant</h2>
+    <p>EduBridge integrates both Claude AI (Anthropic) and ChatGPT (OpenAI) to provide intelligent academic support directly inside the student portal.</p>
+    <div class="card-grid">
+      <div class="card"><div class="icon">📖</div><h4>Study Planner</h4><p>Enter your courses and exam dates — AI generates a personalised, day-by-day revision schedule.</p></div>
+      <div class="card"><div class="icon">💬</div><h4>Academic Tutor</h4><p>Ask questions about course content, request explanations, and get help solving problems.</p></div>
+      <div class="card"><div class="icon">🎯</div><h4>Goal Setting</h4><p>AI helps students set realistic academic goals and break them into daily achievable actions.</p></div>
+      <div class="card"><div class="icon">📅</div><h4>Schedule Help</h4><p>Plan a balanced semester, manage workload, and identify time to rest and social activities.</p></div>
+    </div>
+    <div class="highlight-box">
+      <h3>Works in Demo Mode Too</h3>
+      <p>Even without an API key, EduBridge provides smart canned AI responses about study tips, exam preparation, fee information, and academic planning. To enable full AI responses, institutions add their Claude or OpenAI API key to the server configuration.</p>
+    </div>
+  </div>
+
+  <!-- UNIVERSITY SELECTION -->
+  <div class="section">
+    <h2>Multi-University System</h2>
+    <p>Before logging in, every user selects their university from a searchable gallery of 35+ Ghanaian institutions. The portal automatically rebrands to show the university's name, colours, and logo throughout the interface.</p>
+    <div class="card-grid">
+      <div class="card"><h4>🏛️ Public Universities</h4><p>UG, KNUST, UCC, UDS, UEW, UMaT, UHAS, UENR, GCTU, UPSA, GIMPA, all Technical Universities</p></div>
+      <div class="card"><h4>🎓 Private Universities</h4><p>Ashesi, Central, Valley View, Regent, KAAF, Zenith, BlueCrest, Pentecost, Methodist, Presbyterian, Wisconsin, and more</p></div>
+      <div class="card"><h4>⚙️ Custom Institution</h4><p>Any school not listed can select "Custom Institution" and the admin can configure their own name and branding in the system.</p></div>
+    </div>
+  </div>
+
+  <!-- TECHNICAL STACK -->
+  <div class="section">
+    <h2>Technical Architecture</h2>
+    <div class="card-grid">
+      <div class="card">
+        <h4>Frontend</h4>
+        <div>
+          <span class="tech-badge">React 18</span><span class="tech-badge">Vite</span>
+          <span class="tech-badge">TailwindCSS</span><span class="tech-badge">Chart.js</span>
+          <span class="tech-badge">React Router v6</span><span class="tech-badge">Socket.IO Client</span>
+        </div>
+      </div>
+      <div class="card">
+        <h4>Backend</h4>
+        <div>
+          <span class="tech-badge">Node.js</span><span class="tech-badge">Express.js</span>
+          <span class="tech-badge">MongoDB</span><span class="tech-badge">Mongoose</span>
+          <span class="tech-badge">JWT Auth</span><span class="tech-badge">Socket.IO</span>
+        </div>
+      </div>
+      <div class="card">
+        <h4>AI Integration</h4>
+        <div>
+          <span class="tech-badge">Claude AI (Anthropic)</span>
+          <span class="tech-badge">ChatGPT (OpenAI)</span>
+          <span class="tech-badge">Smart Demo Mode</span>
+        </div>
+      </div>
+      <div class="card">
+        <h4>Features</h4>
+        <div>
+          <span class="tech-badge">Real-time WebSocket</span>
+          <span class="tech-badge">File Upload</span>
+          <span class="tech-badge">CSV Import</span>
+          <span class="tech-badge">bcrypt Security</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETUP / DEPLOYMENT -->
+  <div class="section">
+    <h2>Setup & Deployment</h2>
+    <h3>Local Development (VS Code)</h3>
+    <div class="highlight-box" style="background:#f0fdf4;border-color:#bbf7d0">
+      <h3 style="color:#065f46">Prerequisites</h3>
+      <p>• Node.js v18 or higher — nodejs.org<br>• MongoDB Community Server — mongodb.com/try/download/community<br>• VS Code — code.visualstudio.com</p>
+    </div>
+    <div class="step"><div class="step-num">1</div><div><h4>Extract and Open</h4><p>Extract the ZIP to your desktop. In VS Code: File → Open Folder → select the UniCore folder.</p></div></div>
+    <div class="step"><div class="step-num">2</div><div><h4>Install Dependencies</h4><p><code style="background:#f1f5f9;padding:2px 6px;border-radius:4px">cd backend && npm install</code> then <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px">cd ../frontend && npm install</code></p></div></div>
+    <div class="step"><div class="step-num">3</div><div><h4>Configure .env</h4><p>The backend/.env file is pre-configured for local development. Change JWT_SECRET for production.</p></div></div>
+    <div class="step"><div class="step-num">4</div><div><h4>Seed the Database</h4><p><code style="background:#f1f5f9;padding:2px 6px;border-radius:4px">cd backend && npm run seed</code> — creates all test accounts.</p></div></div>
+    <div class="step"><div class="step-num">5</div><div><h4>Start Both Servers</h4><p>Terminal 1: <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px">cd backend && npm run dev</code> &nbsp; Terminal 2: <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px">cd frontend && npm run dev</code></p></div></div>
+    <div class="step"><div class="step-num">6</div><div><h4>Open in Browser</h4><p>Visit <strong>http://localhost:5173</strong> — you will see the university selection screen.</p></div></div>
+
+    <h3>Default Login Credentials</h3>
+    <table>
+      <tr><th>Role</th><th>Email</th><th>Password</th></tr>
+      <tr><td>Administrator</td><td>admin@edubridge.edu</td><td>Admin@123</td></tr>
+      <tr><td>Lecturer</td><td>teacher@edubridge.edu</td><td>Teacher@123</td></tr>
+      <tr><td>Student</td><td>student@edubridge.edu</td><td>Student@123</td></tr>
+      <tr><td>Parent</td><td>parent@edubridge.edu</td><td>Parent@123</td></tr>
+      <tr><td>Course Rep</td><td>courserep@edubridge.edu</td><td>CourseRep@123</td></tr>
+    </table>
+  </div>
+
+  <!-- COPYRIGHT -->
+  <div class="section">
+    <div class="copyright-box">
+      <h3>🔐 Copyright & Intellectual Property Protection</h3>
+      <p style="color:#94a3b8;font-size:14px;margin-bottom:20px">EduBridge is a proprietary software product. To fully protect your intellectual property, follow these steps:</p>
+      <ol>
+        <li><strong>Copyright Registration (Ghana):</strong> Register with the Copyright Office of Ghana (part of the Ghana Intellectual Property Office — GIPC). Visit gipc.gov.gh and file a "Copyright Registration Form" for software/digital works. Fee is minimal.</li>
+        <li><strong>Trademark the Name:</strong> File a trademark application for "EduBridge" and your company name "NexaVision Technologies" at GIPC. This protects the brand name and logo.</li>
+        <li><strong>Source Code Escrow:</strong> Archive a timestamped copy of your source code via a lawyer or notary public. This creates legal proof of creation date.</li>
+        <li><strong>Terms of Service:</strong> Add a Terms of Service and End-User Licence Agreement (EULA) to the platform stating that the software is proprietary and not open source.</li>
+        <li><strong>International Protection:</strong> For international markets, register under the Berne Convention (Ghana is a signatory) — this automatically protects your work in 180+ countries.</li>
+        <li><strong>WIPO Registration:</strong> Consider filing with the World Intellectual Property Organization (WIPO) at wipo.int for global software protection.</li>
+        <li><strong>Licence Model:</strong> Sell EduBridge as a SaaS (Software as a Service) with annual licensing fees per institution. Never give source code to clients — host it on your servers.</li>
+      </ol>
+      <p style="color:#60a5fa;font-size:13px;margin-top:20px">© 2024 NexaVision Technologies. All rights reserved. Unauthorised reproduction, distribution, or modification of this software is strictly prohibited and subject to legal action under Ghanaian and international copyright law.</p>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

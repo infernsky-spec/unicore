@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniCore System Documentation</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #d97706;
+            --primary-light: #fbbf24;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.05);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg); 
+            color: var(--text); 
+            line-height: 1.6; 
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3 { font-family: 'Outfit', sans-serif; }
+
+        .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+
+        /* Hero Section */
+        header {
+            text-align: center;
+            padding: 80px 20px;
+            background: radial-gradient(circle at center, rgba(217, 119, 6, 0.1) 0%, transparent 70%);
+            border-bottom: 1px solid var(--border);
+        }
+        header h1 { font-size: 3.5rem; font-weight: 800; color: var(--primary-light); margin-bottom: 10px; }
+        header p { font-size: 1.2rem; color: var(--text-muted); }
+
+        /* Sections */
+        section { margin-bottom: 80px; scroll-margin-top: 40px; }
+        .section-title { font-size: 2rem; border-left: 4px solid var(--primary); padding-left: 15px; margin-bottom: 30px; }
+
+        /* Cards */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 30px;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+        .card:hover { transform: translateY(-5px); border-color: var(--primary); }
+        .card h3 { color: var(--primary-light); margin-bottom: 15px; font-size: 1.3rem; }
+        .card p { font-size: 0.95rem; color: var(--text-muted); }
+
+        /* Feature List */
+        .feature-item { display: flex; gap: 15px; margin-bottom: 20px; }
+        .icon { width: 40px; height: 40px; background: rgba(217, 119, 6, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--primary); font-weight: bold; }
+
+        /* Mermaid Wrapper */
+        .diagram-container {
+            background: white;
+            padding: 30px;
+            border-radius: 24px;
+            margin: 30px 0;
+            overflow-x: auto;
+        }
+
+        /* Footer */
+        footer { text-align: center; padding: 40px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.9rem; }
+
+        .tag { display: inline-block; padding: 4px 12px; border-radius: 20px; background: var(--primary); color: white; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="tag">Technical Blueprint</div>
+        <h1>UniCore Platform</h1>
+        <p>A Multi-Tenant Educational Infrastructure with Real-Time Academic Control</p>
+    </header>
+
+    <div class="container">
+        
+        <section id="architecture">
+            <h2 class="section-title">1. System Architecture</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>Multi-Database Tenancy</h3>
+                    <p>Unlike standard systems, UniCore uses a <strong>Database-per-School</strong> model. Each university has its own isolated MongoDB instance. This ensures maximum security, zero data leakage between schools, and independent scaling.</p>
+                </div>
+                <div class="card">
+                    <h3>Real-Time Core</h3>
+                    <p>Powered by Socket.io, the system synchronizes attendance triggers, countdown timers, and notifications instantly across student and teacher portals without page refreshes.</p>
+                </div>
+                <div class="card">
+                    <h3>Dynamic Context Switching</h3>
+                    <p>A custom middleware layer detects the school context from request headers, routing API calls to the correct database on the fly.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="features">
+            <h2 class="section-title">2. Core Modules & Functionality</h2>
+            
+            <h3>🏫 Attendance Protocol (7-Minute Rule)</h3>
+            <div class="card" style="margin: 20px 0;">
+                <p>A high-security attendance system designed to prevent fraud. When a lecturer starts a session:</p>
+                <ul style="margin: 15px 0 0 20px; color: var(--text-muted); font-size: 0.95rem;">
+                    <li>A unique 6-digit PIN is generated.</li>
+                    <li>A <strong>7-minute countdown</strong> begins (Real-time).</li>
+                    <li>The PIN expires automatically after the window closes.</li>
+                    <li>Students must enter the PIN while within the time-window.</li>
+                </ul>
+            </div>
+
+            <h3>🛡️ Leadership Protocol (Course Reps)</h3>
+            <div class="card" style="margin: 20px 0;">
+                <p>Course Representatives are democratically applied for and lecturer-verified:</p>
+                <ul style="margin: 15px 0 0 20px; color: var(--text-muted); font-size: 0.95rem;">
+                    <li>Students apply for "Leadership Status" for specific units.</li>
+                    <li>Requests appear in the Lecturer's <strong>"Rep Requests"</strong> portal.</li>
+                    <li>Upon approval, the student gains administrative tools (PIN management).</li>
+                </ul>
+            </div>
+
+            <h3>🧠 AI Academic Assistant</h3>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">Integrated throughout the student portal to provide research help, course summarization, and academic guidance based on university-specific materials.</p>
+        </section>
+
+        <section id="database">
+            <h2 class="section-title">3. Database Infrastructure</h2>
+            <p>Visual map of the entity relationships within each tenant database:</p>
+            <div class="diagram-container">
+                <pre class="mermaid">
+                erDiagram
+                    UNIVERSITY ||--o{ USER : "tenants"
+                    UNIVERSITY ||--o{ COURSE : "owns"
+                    USER ||--o{ ATTENDANCE_RECORD : "marks"
+                    COURSE ||--o{ ATTENDANCE_SESSION : "has"
+                    ATTENDANCE_SESSION ||--o{ ATTENDANCE_RECORD : "contains"
+                    USER ||--o{ COURSE_REP_REQUEST : "submits"
+                    LECTURER ||--o{ COURSE_REP_REQUEST : "approves"
+                    STAFF_VERIFICATION ||--o{ USER : "verifies"
+                    COURSE ||--o{ GRADE : "records"
+                    USER ||--o{ GRADE : "receives"
+                </pre>
+            </div>
+        </section>
+
+        <section id="portals">
+            <h2 class="section-title">4. Portal Breakdown</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>Student Portal</h3>
+                    <p>Dashboard, Active Attendance Protocols, Leadership Application, Course Registration, and AI Assistant.</p>
+                </div>
+                <div class="card">
+                    <h3>Teacher Portal</h3>
+                    <p>Class Management, Attendance Initiation, Grade Posting, and Rep Request Approval.</p>
+                </div>
+                <div class="card">
+                    <h3>Dept/Faculty Head</h3>
+                    <p>Staff Verification Key Generation, Departmental Performance Tracking, and Oversight.</p>
+                </div>
+                <div class="card">
+                    <h3>Admin Portal</h3>
+                    <p>Global Configuration, Database Maintenance, and Institutional Management.</p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <footer>
+        <p>&copy; 2026 UniCore Platforms - System Documentation v2.1.0</p>
+    </footer>
+
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+    </script>
+</body>
+</html>
