@@ -123,36 +123,40 @@ const runAutoSeed = async () => {
   if (process.env.AUTO_SEED !== 'true') return;
   try {
     const University = require('./src/models/University');
-    const count = await University.countDocuments();
-    if (count === 0) {
-      console.log('🌱 AUTO_SEED: No universities found. Registering all institutions...');
-      const User = require('./src/models/User');
-      const { Faculty, Department, Programme, Course, Semester } = require('./src/models/Academic');
-      const { Announcement } = require('./src/models/Academic2');
-      const { getUniversityConnection, getModel } = require('./src/utils/tenancy');
+    console.log('🌱 AUTO_SEED: Checking university registry...');
+    const User = require('./src/models/User');
+    const { Faculty, Department, Programme, Course, Semester } = require('./src/models/Academic');
+    const { Announcement } = require('./src/models/Academic2');
+    const { getUniversityConnection, getModel } = require('./src/utils/tenancy');
 
-      // ── Step 1: Register ALL universities in master DB ────────────────
-      const registered = [];
-      for (const uniData of GHANA_UNIVERSITIES) {
-        const dbName = `uni_${uniData.shortName.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
-        const uni = await University.create({
+    // ── Step 1: Ensure ALL universities are in master DB ────────────────
+    const registered = [];
+    for (const uniData of GHANA_UNIVERSITIES) {
+      const dbName = `uni_${uniData.shortName.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
+      const uni = await University.findOneAndUpdate(
+        { shortName: uniData.shortName },
+        { 
           name: uniData.name,
-          shortName: uniData.shortName,
           location: uniData.location,
           type: uniData.type,
           dbName,
-          isActive: true,
-        });
-        registered.push({ uni, dbName });
-      }
-      console.log(`   ✅ Registered ${registered.length} universities in master database.`);
+          isActive: true
+        },
+        { upsert: true, new: true }
+      );
+      registered.push({ uni, dbName });
+    }
+    console.log(`   ✅ Synced ${registered.length} universities in master database.`);
 
-      // ── Step 2: Full seed for the first university (EduBridge Hub = UG) ─
-      // Use first uni as demo with full data
-      const demoEntry = registered[0];
-      const demoUni = demoEntry.uni;
-      const demoConn = await getUniversityConnection(demoEntry.dbName);
-      const TenantUser = getModel(demoConn, 'User');
+    const count = await University.countDocuments();
+    // Only seed deep data if this is the first run or specific demo uni is empty
+    const demoEntry = registered.find(r => r.uni.shortName === 'UG') || registered[0];
+    const demoConn = await getUniversityConnection(demoEntry.dbName);
+    const TenantUser = getModel(demoConn, 'User');
+    
+    const adminExists = await TenantUser.findOne({ email: 'admin@edubridge.edu' });
+    if (!adminExists) {
+      console.log(`🌱 AUTO_SEED: Seeding deep demo data for ${demoEntry.uni.name}...`);
       const TenantFaculty = getModel(demoConn, 'Faculty');
       const TenantDepartment = getModel(demoConn, 'Department');
       const TenantProgramme = getModel(demoConn, 'Programme');
@@ -160,35 +164,39 @@ const runAutoSeed = async () => {
       const TenantSemester = getModel(demoConn, 'Semester');
       const TenantAnnouncement = getModel(demoConn, 'Announcement');
 
-      const admin = await TenantUser.create({ firstName: 'System', lastName: 'Admin', email: 'admin@edubridge.edu', password: 'Admin@123', role: 'admin', isActive: true, isEmailVerified: true, university: demoUni._id });
-      // Also create admin in main DB for global lookup
-      await User.create({ firstName: 'System', lastName: 'Admin', email: 'admin@edubridge.edu', password: 'Admin@123', role: 'admin', isActive: true, isEmailVerified: true, university: demoUni._id });
+      const admin = await TenantUser.create({ firstName: 'System', lastName: 'Admin', email: 'admin@edubridge.edu', password: 'Admin@123', role: 'admin', isActive: true, isEmailVerified: true, university: demoEntry.uni._id });
+      // Also ensure in global
+      await User.findOneAndUpdate({ email: 'admin@edubridge.edu' }, { firstName: 'System', lastName: 'Admin', password: 'Admin@123', role: 'admin', isActive: true, university: demoEntry.uni._id }, { upsert: true });
 
-      const fac = await TenantFaculty.create({ name: 'Faculty of Computing and Information Systems', code: 'FCIS', description: 'Technology and Information Science', university: demoUni._id });
-      const deptIT = await TenantDepartment.create({ name: 'Information Technology', code: 'IT', faculty: fac._id, university: demoUni._id });
-      const deptCS = await TenantDepartment.create({ name: 'Computer Science', code: 'CS', faculty: fac._id, university: demoUni._id });
-      const progIT = await TenantProgramme.create({ name: 'BSc Information Technology', code: 'BSCIT', department: deptIT._id, faculty: fac._id, duration: 4, degreeType: 'BSc', university: demoUni._id });
-      const teacher = await TenantUser.create({ firstName: 'Dr. Kwame', lastName: 'Mensah', email: 'teacher@edubridge.edu', password: 'Teacher@123', role: 'teacher', isActive: true, isEmailVerified: true, university: demoUni._id, teacherInfo: { staffId: 'TCH-001', department: deptIT._id, faculty: fac._id, qualification: 'PhD Computer Science', specialization: 'Databases', rank: 'Senior Lecturer' } });
-      const semester = await TenantSemester.create({ name: 'First Semester 2024/2025', academicYear: '2024/2025', semesterNumber: 1, startDate: new Date('2024-09-02'), endDate: new Date('2025-01-17'), status: 'active', isCurrent: true, university: demoUni._id, createdBy: admin._id });
-      const c1 = await TenantCourse.create({ title: 'Introduction to Programming', code: 'IT101', creditHours: 3, level: 100, semester: 1, department: deptIT._id, faculty: fac._id, programme: [progIT._id], teachers: [teacher._id], primaryTeacher: teacher._id, capacity: 150, academicYear: '2024/2025', activeSemester: semester._id, isActive: true, university: demoUni._id });
-      const student = await TenantUser.create({ firstName: 'Ama', lastName: 'Asante', email: 'student@edubridge.edu', password: 'Student@123', role: 'student', isActive: true, isEmailVerified: true, university: demoUni._id, studentInfo: { indexNumber: 'UG/IT/24/0001', programme: progIT._id, department: deptIT._id, faculty: fac._id, level: 100, year: 1, enrollmentYear: 2024, expectedGraduation: 2028, registeredCourses: [c1._id], linkedToAdmin: true } });
+      const fac = await TenantFaculty.create({ name: 'Faculty of Computing and Information Systems', code: 'FCIS', description: 'Technology and Information Science', university: demoEntry.uni._id });
+      const deptIT = await TenantDepartment.create({ name: 'Information Technology', code: 'IT', faculty: fac._id, university: demoEntry.uni._id });
+      const progIT = await TenantProgramme.create({ name: 'BSc Information Technology', code: 'BSCIT', department: deptIT._id, faculty: fac._id, duration: 4, degreeType: 'BSc', university: demoEntry.uni._id });
+      const teacher = await TenantUser.create({ firstName: 'Dr. Kwame', lastName: 'Mensah', email: 'teacher@edubridge.edu', password: 'Teacher@123', role: 'teacher', isActive: true, isEmailVerified: true, university: demoEntry.uni._id, teacherInfo: { staffId: 'TCH-001', department: deptIT._id, faculty: fac._id, qualification: 'PhD Computer Science' } });
+      const semester = await TenantSemester.create({ name: 'First Semester 2024/2025', academicYear: '2024/2025', semesterNumber: 1, startDate: new Date('2024-09-02'), endDate: new Date('2025-01-17'), status: 'active', isCurrent: true, university: demoEntry.uni._id, createdBy: admin._id });
+      const c1 = await TenantCourse.create({ title: 'Introduction to Programming', code: 'IT101', creditHours: 3, level: 100, semester: 1, department: deptIT._id, faculty: fac._id, programme: [progIT._id], teachers: [teacher._id], primaryTeacher: teacher._id, university: demoEntry.uni._id });
       await TenantAnnouncement.create([
-        { title: 'Welcome to UniCore', content: 'Welcome to the Academic Governance Network.', type: 'General', priority: 'high', targetRoles: ['all'], isPublished: true, isPinned: true, createdBy: admin._id, university: demoUni._id },
+        { title: 'Welcome to UniCore', content: 'Academic Governance Network initialized.', type: 'General', priority: 'high', targetRoles: ['all'], isPublished: true, createdBy: admin._id, university: demoEntry.uni._id },
       ]);
-      console.log(`   ✅ Full demo data seeded for ${demoUni.shortName} (${demoEntry.dbName})`);
+      console.log(`   ✅ Deep seed complete for ${demoEntry.uni.shortName}.`);
+    }
 
-      // ── Step 3: Create a default admin in each other university's tenant DB ─
-      let seededCount = 0;
-      for (let i = 1; i < registered.length; i++) {
-        try {
-          const { uni, dbName } = registered[i];
-          const conn = await getUniversityConnection(dbName);
-          const TUser = getModel(conn, 'User');
-          const shortLower = uni.shortName.toLowerCase().replace(/[^a-z0-9]/g, '');
+    // ── Step 3: Ensure each university has at least one admin ─────────────
+    console.log('🌱 AUTO_SEED: Verifying tenant admins...');
+    let seededCount = 0;
+    for (const entry of registered) {
+      try {
+        const { uni, dbName } = entry;
+        const conn = await getUniversityConnection(dbName);
+        const TUser = getModel(conn, 'User');
+        const shortLower = uni.shortName.toLowerCase().replace(/[^a-z0-9]/g, '');
+        const email = `admin@${shortLower}.edu`;
+        
+        const exists = await TUser.findOne({ role: 'admin' });
+        if (!exists) {
           await TUser.create({
             firstName: 'Admin',
             lastName: uni.shortName,
-            email: `admin@${shortLower}.edu`,
+            email,
             password: 'Admin@123',
             role: 'admin',
             isActive: true,
@@ -196,22 +204,16 @@ const runAutoSeed = async () => {
             university: uni._id,
           });
           seededCount++;
-        } catch (seedErr) {
-          // Skip duplicates or errors silently
-          console.warn(`   ⚠️  Seed skipped for ${registered[i].uni.shortName}: ${seedErr.message}`);
         }
+      } catch (seedErr) {
+        // Skip
       }
-      console.log(`   ✅ Admin accounts created for ${seededCount} additional universities.`);
-      console.log('\n╔══════════════════════════════════════════╗');
-      console.log('║     UniCore Auto-Seed Complete ✅        ║');
-      console.log('╠══════════════════════════════════════════╣');
-      console.log(`║  ${registered.length} universities registered              ║`);
-      console.log('║  Each university has its own database    ║');
-      console.log('║  Demo: admin@edubridge.edu / Admin@123   ║');
-      console.log('╚══════════════════════════════════════════╝\n');
-    } else {
-      console.log(`✅ AUTO_SEED: ${count} universities already exist. Skipping seed.`);
     }
+    console.log(`   ✅ Verified ${registered.length} tenant nodes. Created ${seededCount} new admin accounts.`);
+    
+    console.log('\n╔══════════════════════════════════════════╗');
+    console.log('║     UniCore Multi-Tenant Ready! ✅       ║');
+    console.log('╚══════════════════════════════════════════╝\n');
   } catch (err) {
     console.error('⚠️  AUTO_SEED error:', err.message);
   }
