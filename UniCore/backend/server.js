@@ -32,6 +32,7 @@ require('./src/models/Payment');
 require('./src/models/Subscription');
 
 const app = express();
+app.set('trust proxy', 1); // Required for Railway/Vercel proxy environments
 const server = http.createServer(app);
 
 // Ensure upload directories exist
