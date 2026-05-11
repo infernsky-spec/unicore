@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import api from "../utils/api";
 import toast from "react-hot-toast";
 import {
   FiArrowLeft,
@@ -122,26 +123,23 @@ export default function SignUpPage() {
       setUni(u);
 
       // Fetch lecturers for course rep selection
-      fetch(`/api/teachers?university=${u._id}`)
-        .then((res) => res.json())
+      api.get(`/teachers?university=${u._id}`)
         .then((res) => {
-          if (res.success) setLecturers(res.data);
+          if (res.data.success) setLecturers(res.data.data);
         })
         .catch(() => {});
 
       // Fetch departments
-      fetch(`/api/universities/${u._id}/departments`)
-        .then((res) => res.json())
+      api.get(`/universities/${u._id}/departments`)
         .then((res) => {
-          if (res.success) setDepartments(res.data);
+          if (res.data.success) setDepartments(res.data.data);
         })
         .catch(() => {});
 
       // Fetch courses
-      fetch(`/api/course?university=${u._id}`)
-        .then((res) => res.json())
+      api.get(`/course?university=${u._id}`)
         .then((res) => {
-          if (res.success) setAvailableCourses(res.data);
+          if (res.data.success) setAvailableCourses(res.data.data);
         })
         .catch(() => {});
     } catch (e) {
