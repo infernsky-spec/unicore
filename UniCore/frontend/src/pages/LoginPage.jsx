@@ -13,6 +13,7 @@ import {
   FiShield,
   FiCpu,
   FiStar,
+  FiInfo,
 } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -58,7 +59,8 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [uni, setUni] = useState(null);
-  const { login } = useAuth();
+  const [showDemoBanner, setShowDemoBanner] = useState(true);
+  const { login, isDemo } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -96,7 +98,7 @@ export default function LoginPage() {
         form.credential,
         form.role || undefined,
       );
-      toast.success(`Welcome back, ${user.firstName}!`);
+      toast.success(`Welcome, ${user.firstName}! ${isDemo ? '(Demo Mode)' : ''}`);
       const routes = {
         super_admin: "/admin/dashboard",
         admin: "/admin/dashboard",
@@ -105,10 +107,12 @@ export default function LoginPage() {
         parent: "/parent/dashboard",
         faculty_head: "/faculty-head/dashboard",
         dept_head: "/dept-head/dashboard",
+        course_rep: "/student/dashboard",
       };
       navigate(routes[user.role] || "/student/dashboard", { replace: true });
     } catch (err) {
-      toast.error(err.response?.data?.message || "Login failed");
+      const msg = err.message || err.response?.data?.message || "Login failed. Please check your credentials.";
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -248,7 +252,33 @@ export default function LoginPage() {
           animate={{ opacity: 1, x: 0 }}
           className="w-full max-w-[340px] bg-white/60 border border-slate-200 rounded-[20px] p-5 shadow-2xl relative overflow-hidden backdrop-blur-2xl"
         >
-          <div className="flex items-center justify-between mb-8 relative z-10">
+          {/* Demo Credentials Banner */}
+          <AnimatePresence>
+            {showDemoBanner && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="mx-5 mt-4 p-3 rounded-2xl border border-amber-500/30 bg-amber-500/5 relative"
+              >
+                <button
+                  onClick={() => setShowDemoBanner(false)}
+                  className="absolute top-2 right-2 text-slate-400 hover:text-slate-700 text-xs font-bold"
+                >✕</button>
+                <p className="text-[8px] font-black uppercase tracking-widest text-amber-600 mb-2 flex items-center gap-1">
+                  <FiInfo className="w-3 h-3" /> Demo Credentials
+                </p>
+                <div className="space-y-0.5 text-[7px] font-bold text-slate-600">
+                  <p>🎓 <span className="font-black text-slate-800">Student:</span> student@edubridge.edu / Student@123</p>
+                  <p>👨‍🏫 <span className="font-black text-slate-800">Teacher:</span> teacher@edubridge.edu / Teacher@123</p>
+                  <p>⚙️ <span className="font-black text-slate-800">Admin:</span> admin@edubridge.edu / Admin@123</p>
+                  <p>👨‍👩 <span className="font-black text-slate-800">Parent:</span> parent@edubridge.edu / Parent@123</p>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <div className="flex items-center justify-between mb-8 relative z-10 pt-4 px-5">
             <motion.button
               whileHover={{ x: -2 }}
               onClick={() => navigate("/")}

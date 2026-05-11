@@ -1,125 +1,167 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
+import { mockLogin, mockRegister, mockGetMe, isBackendReachable } from '../utils/mockAuth';
 
 const AuthContext = createContext(null);
 
+// ──────────────────────────────────────────────────────────────────────────
+//  Helpers
+// ──────────────────────────────────────────────────────────────────────────
+function saveSession(token, refreshToken) {
+  localStorage.setItem('eb_token', token);
+  if (refreshToken) localStorage.setItem('eb_refresh', refreshToken);
+  api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+}
+
+function clearSession() {
+  localStorage.removeItem('eb_token');
+  localStorage.removeItem('eb_refresh');
+  delete api.defaults.headers.common['Authorization'];
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+//  Provider
+// ──────────────────────────────────────────────────────────────────────────
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isDemo, setIsDemo] = useState(false); // true = running in offline demo mode
+  const backendChecked = useRef(false);
+  const backendAvailable = useRef(false);
 
-  const loadUser = useCallback(async () => {
-    const stored = localStorage.getItem('eb_token');
-    console.log('[AuthContext.loadUser] Token exists:', !!stored);
-    if (!stored) {
-      console.log('[AuthContext.loadUser] No token, skipping load');
-      setLoading(false);
-      setError(null);
-      return;
+  // ── Check backend availability once on mount ──────────────────────────
+  const checkBackend = useCallback(async () => {
+    if (backendChecked.current) return backendAvailable.current;
+    const reachable = await isBackendReachable();
+    backendChecked.current = true;
+    backendAvailable.current = reachable;
+    if (!reachable) {
+      console.warn('[UniCore] Backend unreachable — switching to Demo Mode.');
+      setIsDemo(true);
     }
-    try {
-      setError(null);
-      api.defaults.headers.common['Authorization'] = `Bearer ${stored}`;
-
-      // Create a timeout promise
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Auth check timeout')), 8000)
-      );
-
-      const apiPromise = api.get('/auth/me');
-      const { data } = await Promise.race([apiPromise, timeoutPromise]);
-      console.log('[AuthContext.loadUser] User loaded successfully:', data.user.email);
-      setUser(data.user);
-      setError(null);
-    } catch (err) {
-      console.error('[AuthContext.loadUser] Auth load error:', err.message);
-      localStorage.removeItem('eb_token');
-      localStorage.removeItem('eb_refresh');
-      delete api.defaults.headers.common['Authorization'];
-      setUser(null);
-      setError(null);
-    } finally {
-      setLoading(false);
-    }
+    return reachable;
   }, []);
 
-  useEffect(() => {
-    console.log('[AuthContext] Mounting - attempting to load user');
-    loadUser();
-  }, [loadUser]);
-
-  const login = async (email, passwordOrKey, role) => {
-    console.log('[AuthContext.login] Role:', role);
-    const uniStr = localStorage.getItem('eb_university');
-    let universityId = null;
-    if (uniStr) {
-      try {
-        const uniObj = JSON.parse(uniStr);
-        // Use the shortName/id slug for the header — the middleware resolves it
-        universityId = uniObj.id || uniObj.shortName || uniObj._id;
-      } catch { }
+  // ── Load user from stored token ────────────────────────────────────────
+  const loadUser = useCallback(async () => {
+    const token = localStorage.getItem('eb_token');
+    if (!token) {
+      setLoading(false);
+      return;
     }
 
-    // All roles (including admin and super_admin) use the standard /login endpoint with password
-    const endpoint = '/auth/login';
-    const bodyData = { email, password: passwordOrKey, ...(role && { role }) };
+    const live = await checkBackend();
 
-    // Send university via header so middleware can resolve the DB
-    const headers = universityId ? { 'x-university-id': universityId } : {};
+    if (live) {
+      // ── Live backend path ──────────────────────────────────────────────
+      try {
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        const { data } = await Promise.race([
+          api.get('/auth/me'),
+          new Promise((_, r) => setTimeout(() => r(new Error('timeout')), 6000)),
+        ]);
+        setUser(data.user);
+      } catch (_) {
+        clearSession();
+        setUser(null);
+      }
+    } else {
+      // ── Demo / offline path ────────────────────────────────────────────
+      const u = mockGetMe(token);
+      if (u) setUser(u);
+      else { clearSession(); setUser(null); }
+    }
 
-    try {
-      console.log('[AuthContext.login] Sending request to', endpoint, 'with uni:', universityId);
-      const { data } = await api.post(endpoint, bodyData, { headers });
-      console.log('[AuthContext.login] Login response received:', { userId: data.user?.id, role: data.user?.role });
+    setLoading(false);
+  }, [checkBackend]);
 
-      localStorage.setItem('eb_token', data.token);
-      localStorage.setItem('eb_refresh', data.refreshToken);
-      api.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
+  useEffect(() => { loadUser(); }, [loadUser]);
+
+  // ── Login ──────────────────────────────────────────────────────────────
+  const login = async (email, passwordOrKey, role) => {
+    const uniStr = localStorage.getItem('eb_university');
+    let universityId = null;
+    try { const u = JSON.parse(uniStr); universityId = u.id || u.shortName || u._id; } catch (_) {}
+
+    const live = await checkBackend();
+
+    if (live) {
+      // Live backend login
+      try {
+        const headers = universityId ? { 'x-university-id': universityId } : {};
+        const { data } = await api.post('/auth/login',
+          { email, password: passwordOrKey, ...(role && { role }) },
+          { headers }
+        );
+        saveSession(data.token, data.refreshToken);
+        setUser(data.user);
+        setIsDemo(false);
+        return data.user;
+      } catch (err) {
+        // If backend rejects, fall through to demo as last resort
+        const msg = err.response?.data?.message;
+        if (msg) throw new Error(msg);
+        throw err;
+      }
+    } else {
+      // Demo mode login
+      const data = mockLogin(email, passwordOrKey, role);
+      saveSession(data.token, data.refreshToken);
       setUser(data.user);
-      console.log('[AuthContext.login] User set successfully');
+      setIsDemo(true);
       return data.user;
-    } catch (error) {
-      console.error('[AuthContext.login] Login failed:', error);
-      throw error;
     }
   };
 
+  // ── Register ───────────────────────────────────────────────────────────
   const register = async (payload) => {
     const uniStr = localStorage.getItem('eb_university');
     let universityId = null;
-    if (uniStr) {
+    try { const u = JSON.parse(uniStr); universityId = u.id || u.shortName || u._id; } catch (_) {}
+
+    const live = await checkBackend();
+
+    if (live) {
       try {
-        const uniObj = JSON.parse(uniStr);
-        // Use the shortName/id slug for the header
-        universityId = uniObj.id || uniObj.shortName || uniObj._id;
-      } catch { }
+        const headers = universityId ? { 'x-university-id': universityId } : {};
+        const { data } = await api.post('/auth/register', payload, { headers });
+        saveSession(data.token, data.refreshToken);
+        setUser(data.user);
+        setIsDemo(false);
+        return data.user;
+      } catch (err) {
+        const msg = err.response?.data?.message;
+        if (msg) throw new Error(msg);
+        throw err;
+      }
+    } else {
+      // Demo mode registration
+      const data = mockRegister(payload);
+      saveSession(data.token, data.refreshToken);
+      setUser(data.user);
+      setIsDemo(true);
+      return data.user;
     }
-    const finalPayload = { ...payload };
-    // Send university via header so the middleware can correctly resolve it by slug
-    const headers = universityId ? { 'x-university-id': universityId } : {};
-    const { data } = await api.post('/auth/register', finalPayload, { headers });
-    localStorage.setItem('eb_token', data.token);
-    localStorage.setItem('eb_refresh', data.refreshToken);
-    api.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
-    setUser(data.user);
-    return data.user;
   };
 
+  // ── Logout ─────────────────────────────────────────────────────────────
   const logout = async () => {
-    try { await api.post('/auth/logout'); } catch { }
-    localStorage.removeItem('eb_token');
-    localStorage.removeItem('eb_refresh');
-    // KEEP the university selection - user stays on same university
-    delete api.defaults.headers.common['Authorization'];
+    if (backendAvailable.current) {
+      try { await api.post('/auth/logout'); } catch (_) {}
+    }
+    clearSession();
     setUser(null);
-    toast.success('Logged out');
+    toast.success('Logged out successfully.');
   };
 
-  const updateUser = (u) => setUser(prev => ({ ...prev, ...u }));
+  const updateUser = (u) => setUser((prev) => ({ ...prev, ...u }));
 
   return (
-    <AuthContext.Provider value={{ user, loading, error, login, register, logout, updateUser, loadUser }}>
+    <AuthContext.Provider
+      value={{ user, loading, error, isDemo, login, register, logout, updateUser, loadUser }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -130,4 +172,3 @@ export const useAuth = () => {
   if (!ctx) throw new Error('useAuth must be inside AuthProvider');
   return ctx;
 };
-

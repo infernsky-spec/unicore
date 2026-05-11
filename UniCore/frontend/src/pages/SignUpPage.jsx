@@ -202,7 +202,8 @@ export default function SignUpPage() {
       };
       navigate(map[form.role] || "/");
     } catch (err) {
-      toast.error(err.response?.data?.message || "Registration failed");
+      const msg = err.message || err.response?.data?.message || "Registration failed. Please check your inputs.";
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
