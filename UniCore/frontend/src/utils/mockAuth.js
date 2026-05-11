@@ -91,10 +91,19 @@ function toPublicUser(user) {
 // ──────────────────────────────────────────────
 export async function isBackendReachable() {
   try {
-    const apiBase = import.meta.env.VITE_API_URL || '/api';
+    const apiBase = import.meta.env.VITE_API_URL;
+    // If no VITE_API_URL is configured, we are in mock mode — skip check
+    if (!apiBase) return false;
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3000);
-    const res = await fetch(apiBase.replace('/api', '/health'), { signal: controller.signal });
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    // Build health URL: if apiBase ends with /api → swap for /api/health, else append /health
+    const healthUrl = apiBase.endsWith('/api')
+      ? `${apiBase}/health`
+      : `${apiBase}/api/health`;
+    const res = await fetch(healthUrl, {
+      signal: controller.signal,
+      mode: 'cors',
+    });
     clearTimeout(timeoutId);
     return res.ok;
   } catch (_) {
