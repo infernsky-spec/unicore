@@ -108,7 +108,8 @@ const Floating3DAsset = ({
 };
 
 export default function UniversitySelectPage() {
-  const [universities] = useState(GHANA_UNIVERSITIES);
+  const [universities, setUniversities] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
   const [showConfirm, setShowConfirm] = useState(false);
@@ -117,6 +118,28 @@ export default function UniversitySelectPage() {
   const mouseX = useRef(window.innerWidth / 2);
   const mouseY = useRef(window.innerHeight / 2);
   const { isDark, toggle } = useTheme();
+
+  useEffect(() => {
+    const fetchUniversities = async () => {
+      try {
+        const apiBase = import.meta.env.VITE_API_URL || '/api';
+        const res = await fetch(`${apiBase}/universities`);
+        const data = await res.json();
+        if (data.success) {
+          setUniversities(data.data);
+        } else {
+          // Fallback to static list if API fails
+          setUniversities(GHANA_UNIVERSITIES);
+        }
+      } catch (err) {
+        console.error("Failed to fetch universities:", err);
+        setUniversities(GHANA_UNIVERSITIES);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUniversities();
+  }, []);
 
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -143,7 +166,11 @@ export default function UniversitySelectPage() {
 
   const handleConfirm = () => {
     if (currentUniConfirm) {
-      localStorage.setItem("eb_university", JSON.stringify(currentUniConfirm));
+      // Store the backend ID for tenant isolation
+      localStorage.setItem("eb_university", JSON.stringify({
+        ...currentUniConfirm,
+        id: currentUniConfirm._id || currentUniConfirm.id // Prefer DB _id
+      }));
       navigate("/login");
     }
   };
@@ -322,7 +349,17 @@ export default function UniversitySelectPage() {
           className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 perspective-1000"
         >
           <AnimatePresence>
-            {filteredUniversities.map((uni) => (
+            {loading ? (
+              // Skeleton Loading State
+              Array.from({ length: 12 }).map((_, i) => (
+                <div key={`skeleton-${i}`} className="animate-pulse p-5 bg-slate-100/50 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-[20px] h-[180px]">
+                  <div className="w-14 h-14 bg-slate-200 dark:bg-white/10 rounded-[22px] mb-8" />
+                  <div className="h-3 bg-slate-200 dark:bg-white/10 rounded w-1/2 mb-2" />
+                  <div className="h-2 bg-slate-200 dark:bg-white/5 rounded w-full mb-4" />
+                  <div className="h-6 bg-slate-200 dark:bg-white/10 rounded-xl w-1/3" />
+                </div>
+              ))
+            ) : filteredUniversities.map((uni) => (
               <motion.div
                 layout="position"
                 initial={{ opacity: 0, y: 40, scale: 0.95 }}
@@ -376,9 +413,9 @@ export default function UniversitySelectPage() {
           </AnimatePresence>
         </motion.div>
 
-        {filteredUniversities.length === 0 && (
-          <div className="text-center py-24 border border-dashed border-slate-200 rounded-[20px] bg-slate-100 backdrop-blur-md">
-            <p className="text-slate-600 font-black uppercase tracking-[0.3em] text-[8px]">
+        {!loading && filteredUniversities.length === 0 && (
+          <div className="text-center py-24 border border-dashed border-slate-200 rounded-[20px] bg-slate-100 dark:bg-white/5 backdrop-blur-md">
+            <p className="text-slate-600 dark:text-slate-400 font-black uppercase tracking-[0.3em] text-[8px]">
               Node not found
             </p>
           </div>
