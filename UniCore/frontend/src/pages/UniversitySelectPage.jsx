@@ -12,9 +12,12 @@ import {
   FiAward,
   FiBook,
   FiBriefcase,
+  FiSun,
+  FiMoon,
 } from "react-icons/fi";
 import { HiAcademicCap } from "react-icons/hi";
 import { GHANA_UNIVERSITIES } from "../utils/universities";
+import { useTheme } from "../contexts/ThemeContext";
 
 const Floating3DAsset = ({
   icon: Icon,
@@ -113,6 +116,7 @@ export default function UniversitySelectPage() {
   const navigate = useNavigate();
   const mouseX = useRef(window.innerWidth / 2);
   const mouseY = useRef(window.innerHeight / 2);
+  const { isDark, toggle } = useTheme();
 
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -188,6 +192,46 @@ export default function UniversitySelectPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 selection:bg-amber-500/30 selection:text-amber-500 relative overflow-x-hidden font-sans">
+      {/* ── Theme Toggle Button (Top Right) ─────────────────────────────── */}
+      <motion.button
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.5, type: "spring", stiffness: 300 }}
+        onClick={toggle}
+        id="theme-toggle"
+        aria-label={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+        className="fixed top-6 right-6 z-50 w-12 h-12 rounded-2xl flex items-center justify-center
+          bg-white/70 dark:bg-white/10 border border-slate-200 dark:border-white/10
+          backdrop-blur-xl shadow-lg hover:shadow-xl
+          hover:scale-110 active:scale-95
+          transition-all duration-300 group cursor-pointer"
+        style={{ boxShadow: isDark ? '0 0 20px rgba(251,191,36,0.15)' : '0 4px 20px rgba(0,0,0,0.08)' }}
+      >
+        <AnimatePresence mode="wait">
+          {isDark ? (
+            <motion.div
+              key="sun"
+              initial={{ rotate: -90, scale: 0, opacity: 0 }}
+              animate={{ rotate: 0, scale: 1, opacity: 1 }}
+              exit={{ rotate: 90, scale: 0, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <FiSun className="w-5 h-5 text-amber-400 group-hover:text-amber-300" />
+            </motion.div>
+          ) : (
+            <motion.div
+              key="moon"
+              initial={{ rotate: 90, scale: 0, opacity: 0 }}
+              animate={{ rotate: 0, scale: 1, opacity: 1 }}
+              exit={{ rotate: -90, scale: 0, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <FiMoon className="w-5 h-5 text-slate-600 group-hover:text-slate-900" />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.button>
+
       {/* Floating 3D Tiny Assets */}
       {backgroundAssets.map((asset, i) => (
         <Floating3DAsset key={i} {...asset} mouseX={mouseX} mouseY={mouseY} />

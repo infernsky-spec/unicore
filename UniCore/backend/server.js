@@ -66,46 +66,149 @@ const io = new Server(server, {
 initializeSocket(io);
 app.set('io', io);
 
+// ── Complete Ghana University Registry ─────────────────────────────────────
+const GHANA_UNIVERSITIES = [
+  // PUBLIC
+  { name: 'University of Ghana', shortName: 'UG', location: 'Legon, Accra', type: 'Public' },
+  { name: 'Kwame Nkrumah University of Science and Technology', shortName: 'KNUST', location: 'Kumasi', type: 'Public' },
+  { name: 'University of Cape Coast', shortName: 'UCC', location: 'Cape Coast', type: 'Public' },
+  { name: 'University for Development Studies', shortName: 'UDS', location: 'Tamale', type: 'Public' },
+  { name: 'University of Education, Winneba', shortName: 'UEW', location: 'Winneba', type: 'Public' },
+  { name: 'University of Mines and Technology', shortName: 'UMaT', location: 'Tarkwa', type: 'Public' },
+  { name: 'University of Health and Allied Sciences', shortName: 'UHAS', location: 'Ho', type: 'Public' },
+  { name: 'University of Energy and Natural Resources', shortName: 'UENR', location: 'Sunyani', type: 'Public' },
+  { name: 'University of Professional Studies Accra', shortName: 'UPSA', location: 'Accra', type: 'Public' },
+  { name: 'Ghana Institute of Management & Public Administration', shortName: 'GIMPA', location: 'Greenhill', type: 'Public' },
+  { name: 'Ghana Communication Technology University', shortName: 'GCTU', location: 'Accra', type: 'Public' },
+  { name: 'Regional Maritime University', shortName: 'RMU', location: 'Tema', type: 'Public' },
+  { name: 'Ghana Institute of Journalism', shortName: 'GIJ', location: 'Accra', type: 'Public' },
+  { name: 'Valley View University', shortName: 'VVU', location: 'Oyibi', type: 'Public' },
+  { name: 'SD Dombo University of Business & Integrated Dev', shortName: 'SDD-UBIDS', location: 'Navrongo', type: 'Public' },
+  // TECHNICAL
+  { name: 'Takoradi Technical University', shortName: 'TTU', location: 'Takoradi', type: 'Technical' },
+  { name: 'Accra Technical University', shortName: 'ATU', location: 'Accra', type: 'Technical' },
+  { name: 'Ho Technical University', shortName: 'HTU', location: 'Ho', type: 'Technical' },
+  { name: 'Kumasi Technical University', shortName: 'KsTU', location: 'Kumasi', type: 'Technical' },
+  { name: 'Bolgatanga Technical University', shortName: 'BTU', location: 'Bolgatanga', type: 'Technical' },
+  { name: 'Wa Technical University', shortName: 'WaTU', location: 'Wa', type: 'Technical' },
+  { name: 'Cape Coast Technical University', shortName: 'CCTU', location: 'Cape Coast', type: 'Technical' },
+  { name: 'Koforidua Technical University', shortName: 'KTU', location: 'Koforidua', type: 'Technical' },
+  { name: 'Sunyani Technical University', shortName: 'STU', location: 'Sunyani', type: 'Technical' },
+  { name: 'Tamale Technical University', shortName: 'TaTU', location: 'Tamale', type: 'Technical' },
+  // PRIVATE
+  { name: 'Ashesi University', shortName: 'Ashesi', location: 'Berekuso', type: 'Private' },
+  { name: 'Central University', shortName: 'Central', location: 'Miotso', type: 'Private' },
+  { name: 'Regent University College of Science & Technology', shortName: 'Regent', location: 'Dansoman', type: 'Private' },
+  { name: 'Lancaster University Ghana', shortName: 'LUG', location: 'Central Region', type: 'Private' },
+  { name: 'Academic City University College', shortName: 'ACUC', location: 'Accra', type: 'Private' },
+  { name: 'All Nations University', shortName: 'ANUC', location: 'Koforidua', type: 'Private' },
+  { name: 'Pentecost University', shortName: 'PU', location: 'Sowutuom', type: 'Private' },
+  { name: 'Methodist University Ghana', shortName: 'MUG', location: 'Tema', type: 'Private' },
+  { name: 'Christian Service University College', shortName: 'CSUC', location: 'Kumasi', type: 'Private' },
+  { name: 'Catholic University College of Ghana', shortName: 'CUCG', location: 'Sunyani', type: 'Private' },
+  { name: 'Wisconsin International University College', shortName: 'WIUC', location: 'Accra', type: 'Private' },
+  { name: 'BlueCrest University College', shortName: 'BlueCrest', location: 'Accra', type: 'Private' },
+  { name: 'Radford University College', shortName: 'Radford', location: 'Abokobi', type: 'Private' },
+  { name: 'Knutsford University College', shortName: 'Knutsford', location: 'Accra', type: 'Private' },
+  { name: 'Data Link University College', shortName: 'DLI', location: 'Tema', type: 'Private' },
+  { name: 'Webster University Ghana', shortName: 'Webster', location: 'East Legon', type: 'Private' },
+  { name: 'Presbyterian University College', shortName: 'PUCG', location: 'Abetifi', type: 'Private' },
+  { name: 'Islamic University College Ghana', shortName: 'IUG', location: 'Accra', type: 'Private' },
+  { name: 'KAAF University College', shortName: 'KAAF', location: 'Airport', type: 'Private' },
+  { name: 'Accra Institute of Technology', shortName: 'AIT', location: 'Accra', type: 'Private' },
+  { name: 'Kings University College', shortName: 'KUC', location: 'Accra', type: 'Private' },
+];
+
 const runAutoSeed = async () => {
   if (process.env.AUTO_SEED !== 'true') return;
   try {
     const University = require('./src/models/University');
     const count = await University.countDocuments();
     if (count === 0) {
-      console.log('🌱 AUTO_SEED: No universities found. Running seeder...');
-      // Inline seed to avoid path/process.exit issues
-      const bcrypt = require('bcryptjs');
+      console.log('🌱 AUTO_SEED: No universities found. Registering all institutions...');
       const User = require('./src/models/User');
       const { Faculty, Department, Programme, Course, Semester } = require('./src/models/Academic');
-      const { FeeStructure, FeeBill } = require('./src/models/Fees');
       const { Announcement } = require('./src/models/Academic2');
+      const { getUniversityConnection, getModel } = require('./src/utils/tenancy');
 
-      const uni = await University.create({ name: 'EduBridge Hub', shortName: 'EBH', location: 'Cloud', type: 'Technical', isActive: true });
-      const admin = await User.create({ firstName: 'System', lastName: 'Admin', email: 'admin@edubridge.edu', password: 'Admin@123', role: 'admin', isActive: true, isEmailVerified: true, university: uni._id });
-      const fac = await Faculty.create({ name: 'Faculty of Computing and Information Systems', code: 'FCIS', description: 'Technology and Information Science', university: uni._id });
-      const facB = await Faculty.create({ name: 'Faculty of Business', code: 'FB', university: uni._id });
-      const deptIT = await Department.create({ name: 'Information Technology', code: 'IT', faculty: fac._id, university: uni._id });
-      const deptCS = await Department.create({ name: 'Computer Science', code: 'CS', faculty: fac._id, university: uni._id });
-      await Department.create({ name: 'Business Administration', code: 'BA', faculty: facB._id, university: uni._id });
-      const progIT = await Programme.create({ name: 'BSc Information Technology', code: 'BSCIT', department: deptIT._id, faculty: fac._id, duration: 4, degreeType: 'BSc', university: uni._id });
-      await Programme.create({ name: 'BSc Computer Science', code: 'BSCCS', department: deptCS._id, faculty: fac._id, duration: 4, degreeType: 'BSc', university: uni._id });
-      const teacher = await User.create({ firstName: 'Dr. Kwame', lastName: 'Mensah', email: 'teacher@edubridge.edu', password: 'Teacher@123', role: 'teacher', isActive: true, isEmailVerified: true, university: uni._id, teacherInfo: { staffId: 'TCH-001', department: deptIT._id, faculty: fac._id, qualification: 'PhD Computer Science', specialization: 'Databases', rank: 'Senior Lecturer', officeLocation: 'Block A Room 205' } });
-      const semester = await Semester.create({ name: 'First Semester 2024/2025', academicYear: '2024/2025', semesterNumber: 1, startDate: new Date('2024-09-02'), endDate: new Date('2025-01-17'), examStartDate: new Date('2025-01-06'), examEndDate: new Date('2025-01-17'), registrationDeadline: new Date('2024-09-20'), status: 'active', isCurrent: true, university: uni._id, createdBy: admin._id });
-      const c1 = await Course.create({ title: 'Introduction to Programming', code: 'IT101', description: 'Fundamentals using Python', creditHours: 3, level: 100, semester: 1, department: deptIT._id, faculty: fac._id, programme: [progIT._id], teachers: [teacher._id], primaryTeacher: teacher._id, capacity: 150, academicYear: '2024/2025', activeSemester: semester._id, isActive: true, university: uni._id, schedule: [{ day: 'Monday', startTime: '08:00', endTime: '10:00', venue: 'Lecture Hall A', type: 'Lecture' }] });
-      const c2 = await Course.create({ title: 'Database Management Systems', code: 'IT201', creditHours: 3, level: 200, semester: 1, department: deptIT._id, faculty: fac._id, programme: [progIT._id], university: uni._id, teachers: [teacher._id], primaryTeacher: teacher._id, academicYear: '2024/2025', activeSemester: semester._id, isActive: true, schedule: [{ day: 'Tuesday', startTime: '10:00', endTime: '12:00', venue: 'Lecture Hall B', type: 'Lecture' }] });
-      const c3 = await Course.create({ title: 'Web Development', code: 'IT102', creditHours: 3, level: 100, semester: 1, department: deptIT._id, faculty: fac._id, programme: [progIT._id], university: uni._id, teachers: [teacher._id], primaryTeacher: teacher._id, academicYear: '2024/2025', activeSemester: semester._id, isActive: true, schedule: [{ day: 'Thursday', startTime: '08:00', endTime: '10:00', venue: 'Lab 2', type: 'Lab' }] });
-      await User.findByIdAndUpdate(teacher._id, { 'teacherInfo.courses': [c1._id, c2._id, c3._id] });
-      const student = await User.create({ firstName: 'Ama', lastName: 'Asante', email: 'student@edubridge.edu', password: 'Student@123', role: 'student', isActive: true, isEmailVerified: true, university: uni._id, studentInfo: { indexNumber: 'EDU/IT/24/0001', programme: progIT._id, department: deptIT._id, faculty: fac._id, level: 100, year: 1, enrollmentYear: 2024, expectedGraduation: 2028, isCourseRep: false, registeredCourses: [c1._id, c3._id], linkedToAdmin: true } });
-      const rep = await User.create({ firstName: 'Kofi', lastName: 'Boateng', email: 'courserep@edubridge.edu', password: 'CourseRep@123', role: 'course_rep', isActive: true, isEmailVerified: true, university: uni._id, studentInfo: { indexNumber: 'EDU/IT/24/0002', programme: progIT._id, department: deptIT._id, faculty: fac._id, level: 100, year: 1, enrollmentYear: 2024, expectedGraduation: 2028, isCourseRep: true, courseRepFor: [c1._id], registeredCourses: [c1._id], linkedToAdmin: true } });
-      await Course.findByIdAndUpdate(c1._id, { $addToSet: { enrolledStudents: { $each: [student._id, rep._id] } }, courseRep: rep._id });
-      await Announcement.create([
-        { title: 'Welcome to 2024/2025', content: 'The administration warmly welcomes all students and staff.', type: 'General', priority: 'high', targetRoles: ['all'], isPublished: true, isPinned: true, createdBy: admin._id, university: uni._id },
-        { title: 'Course Registration Open', content: 'All students must register their courses before September 20.', type: 'Academic', priority: 'urgent', targetRoles: ['student'], isPublished: true, createdBy: admin._id, university: uni._id },
+      // ── Step 1: Register ALL universities in master DB ────────────────
+      const registered = [];
+      for (const uniData of GHANA_UNIVERSITIES) {
+        const dbName = `uni_${uniData.shortName.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
+        const uni = await University.create({
+          name: uniData.name,
+          shortName: uniData.shortName,
+          location: uniData.location,
+          type: uniData.type,
+          dbName,
+          isActive: true,
+        });
+        registered.push({ uni, dbName });
+      }
+      console.log(`   ✅ Registered ${registered.length} universities in master database.`);
+
+      // ── Step 2: Full seed for the first university (EduBridge Hub = UG) ─
+      // Use first uni as demo with full data
+      const demoEntry = registered[0];
+      const demoUni = demoEntry.uni;
+      const demoConn = await getUniversityConnection(demoEntry.dbName);
+      const TenantUser = getModel(demoConn, 'User');
+      const TenantFaculty = getModel(demoConn, 'Faculty');
+      const TenantDepartment = getModel(demoConn, 'Department');
+      const TenantProgramme = getModel(demoConn, 'Programme');
+      const TenantCourse = getModel(demoConn, 'Course');
+      const TenantSemester = getModel(demoConn, 'Semester');
+      const TenantAnnouncement = getModel(demoConn, 'Announcement');
+
+      const admin = await TenantUser.create({ firstName: 'System', lastName: 'Admin', email: 'admin@edubridge.edu', password: 'Admin@123', role: 'admin', isActive: true, isEmailVerified: true, university: demoUni._id });
+      // Also create admin in main DB for global lookup
+      await User.create({ firstName: 'System', lastName: 'Admin', email: 'admin@edubridge.edu', password: 'Admin@123', role: 'admin', isActive: true, isEmailVerified: true, university: demoUni._id });
+
+      const fac = await TenantFaculty.create({ name: 'Faculty of Computing and Information Systems', code: 'FCIS', description: 'Technology and Information Science', university: demoUni._id });
+      const deptIT = await TenantDepartment.create({ name: 'Information Technology', code: 'IT', faculty: fac._id, university: demoUni._id });
+      const deptCS = await TenantDepartment.create({ name: 'Computer Science', code: 'CS', faculty: fac._id, university: demoUni._id });
+      const progIT = await TenantProgramme.create({ name: 'BSc Information Technology', code: 'BSCIT', department: deptIT._id, faculty: fac._id, duration: 4, degreeType: 'BSc', university: demoUni._id });
+      const teacher = await TenantUser.create({ firstName: 'Dr. Kwame', lastName: 'Mensah', email: 'teacher@edubridge.edu', password: 'Teacher@123', role: 'teacher', isActive: true, isEmailVerified: true, university: demoUni._id, teacherInfo: { staffId: 'TCH-001', department: deptIT._id, faculty: fac._id, qualification: 'PhD Computer Science', specialization: 'Databases', rank: 'Senior Lecturer' } });
+      const semester = await TenantSemester.create({ name: 'First Semester 2024/2025', academicYear: '2024/2025', semesterNumber: 1, startDate: new Date('2024-09-02'), endDate: new Date('2025-01-17'), status: 'active', isCurrent: true, university: demoUni._id, createdBy: admin._id });
+      const c1 = await TenantCourse.create({ title: 'Introduction to Programming', code: 'IT101', creditHours: 3, level: 100, semester: 1, department: deptIT._id, faculty: fac._id, programme: [progIT._id], teachers: [teacher._id], primaryTeacher: teacher._id, capacity: 150, academicYear: '2024/2025', activeSemester: semester._id, isActive: true, university: demoUni._id });
+      const student = await TenantUser.create({ firstName: 'Ama', lastName: 'Asante', email: 'student@edubridge.edu', password: 'Student@123', role: 'student', isActive: true, isEmailVerified: true, university: demoUni._id, studentInfo: { indexNumber: 'UG/IT/24/0001', programme: progIT._id, department: deptIT._id, faculty: fac._id, level: 100, year: 1, enrollmentYear: 2024, expectedGraduation: 2028, registeredCourses: [c1._id], linkedToAdmin: true } });
+      await TenantAnnouncement.create([
+        { title: 'Welcome to UniCore', content: 'Welcome to the Academic Governance Network.', type: 'General', priority: 'high', targetRoles: ['all'], isPublished: true, isPinned: true, createdBy: admin._id, university: demoUni._id },
       ]);
-      console.log('✅ AUTO_SEED: Database seeded successfully!');
-      console.log('   admin@edubridge.edu / Admin@123');
-      console.log('   teacher@edubridge.edu / Teacher@123');
-      console.log('   student@edubridge.edu / Student@123');
+      console.log(`   ✅ Full demo data seeded for ${demoUni.shortName} (${demoEntry.dbName})`);
+
+      // ── Step 3: Create a default admin in each other university's tenant DB ─
+      let seededCount = 0;
+      for (let i = 1; i < registered.length; i++) {
+        try {
+          const { uni, dbName } = registered[i];
+          const conn = await getUniversityConnection(dbName);
+          const TUser = getModel(conn, 'User');
+          const shortLower = uni.shortName.toLowerCase().replace(/[^a-z0-9]/g, '');
+          await TUser.create({
+            firstName: 'Admin',
+            lastName: uni.shortName,
+            email: `admin@${shortLower}.edu`,
+            password: 'Admin@123',
+            role: 'admin',
+            isActive: true,
+            isEmailVerified: true,
+            university: uni._id,
+          });
+          seededCount++;
+        } catch (seedErr) {
+          // Skip duplicates or errors silently
+          console.warn(`   ⚠️  Seed skipped for ${registered[i].uni.shortName}: ${seedErr.message}`);
+        }
+      }
+      console.log(`   ✅ Admin accounts created for ${seededCount} additional universities.`);
+      console.log('\n╔══════════════════════════════════════════╗');
+      console.log('║     UniCore Auto-Seed Complete ✅        ║');
+      console.log('╠══════════════════════════════════════════╣');
+      console.log(`║  ${registered.length} universities registered              ║`);
+      console.log('║  Each university has its own database    ║');
+      console.log('║  Demo: admin@edubridge.edu / Admin@123   ║');
+      console.log('╚══════════════════════════════════════════╝\n');
     } else {
       console.log(`✅ AUTO_SEED: ${count} universities already exist. Skipping seed.`);
     }
@@ -115,6 +218,7 @@ const runAutoSeed = async () => {
 };
 
 connectDB().then(runAutoSeed);
+
 
 app.use(helmet({ crossOriginEmbedderPolicy: false, contentSecurityPolicy: false }));
 
